@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="30dp"
+    android:gravity="center"
+    tools:context="joshcarroll.projects.android.taskpal.fragment.DeleteTaskFragment">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25dp"
+        android:textColor="@color/ColorNavy"
+        android:text="Delete Task?"
+        android:id="@+id/are_you_sure"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/cancel_button"
+            android:text="Cancel"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:background="@color/colorGreen"
+            android:textColor="@color/colorWhite"
+            android:layout_marginRight="10dp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/delete_button"
+            android:text="OK"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:textColor="@color/colorWhite"
+            android:background="@color/colorGreen"/>
+    </LinearLayout>
+</LinearLayout>
