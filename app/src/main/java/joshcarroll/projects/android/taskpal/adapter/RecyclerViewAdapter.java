@@ -3,12 +3,15 @@ package joshcarroll.projects.android.taskpal.adapter;
 import android.content.Context;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -26,6 +29,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private Context mContext;
     private List<NewTask> mTasks;
+    private int mExpandedPosition = -1;
+    private View newView;
 
     public RecyclerViewAdapter(Context context, List<NewTask> tasks){
 
@@ -52,22 +57,35 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(ViewHolder taskViewHolder, int i) {
 
-        taskViewHolder.mTitle.setText(mTasks.get(i).getTitle());
-        taskViewHolder.mDescription.setText(mTasks.get(i).getDescription());
-
         final int position = i;
 
-        taskViewHolder.mImageSettingIcon.setOnClickListener(new View.OnClickListener() {
+        taskViewHolder.mTitle.setText(mTasks.get(i).getTitle());
+        taskViewHolder.mDescription.setText(mTasks.get(i).getDescription());
+        taskViewHolder.mAddress.setText(mTasks.get(i).getAddress());
+        taskViewHolder.mMenuLayout.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
-                PopupMenu popup = new PopupMenu(mContext, v);
+            public void onClick(View view) {
+                PopupMenu popup = new PopupMenu(mContext, view);
                 MenuInflater inflater = popup.getMenuInflater();
                 inflater.inflate(R.menu.card_menu, popup.getMenu());
                 popup.setOnMenuItemClickListener(new MyMenuItemClickListener(mTasks.get(position)));
                 popup.show();
             }
         });
+
+
+
+//        taskViewHolder.mImageSettingIcon.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                PopupMenu popup = new PopupMenu(mContext, v);
+//                MenuInflater inflater = popup.getMenuInflater();
+//                inflater.inflate(R.menu.card_menu, popup.getMenu());
+//                popup.setOnMenuItemClickListener(new MyMenuItemClickListener(mTasks.get(position)));
+//                popup.show();
+//            }
+//        });
     }
 
 
@@ -75,8 +93,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         private TextView mTitle;
         private TextView mDescription;
+        private TextView mAddress;
         private ImageView mImagePenIcon;
-        private  ImageView mImageSettingIcon;
+        private ImageView mImageSettingIcon;
+        private ImageView mUpDownIcon;
+        private RelativeLayout mExpandedCardLayout;
+        private RelativeLayout mMenuLayout;
+
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -84,7 +107,28 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             mImagePenIcon = (ImageView)itemView.findViewById(R.id.image_view);
             mTitle = (TextView)itemView.findViewById(R.id.id_title);
             mDescription = (TextView)itemView.findViewById(R.id.id_description);
-            mImageSettingIcon = (ImageView)itemView.findViewById(R.id.card_button_menu);
+//            mImageSettingIcon = (ImageView)itemView.findViewById(R.id.card_button_menu);
+            mAddress = (TextView)itemView.findViewById(R.id.id_address);
+            mUpDownIcon = (ImageView)itemView.findViewById(R.id.id_more_less_button);
+            mExpandedCardLayout =(RelativeLayout) itemView.findViewById(R.id.expanding_card_layout);
+            mMenuLayout = (RelativeLayout)itemView.findViewById(R.id.id_menu_layout);
+            mExpandedCardLayout.setVisibility(View.GONE);
+            //onClick to expand card view and show address field
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    if(mExpandedCardLayout.getVisibility() == View.GONE){
+
+                        mExpandedCardLayout.setVisibility(View.VISIBLE);
+                        mUpDownIcon.setImageResource(R.drawable.up_arrow);
+                    }
+                    else{
+                        mExpandedCardLayout.setVisibility(View.GONE);
+                        mUpDownIcon.setImageResource(R.drawable.down_arrow);
+                    }
+                }
+            });
         }
     }
     class MyMenuItemClickListener implements PopupMenu.OnMenuItemClickListener {
@@ -108,6 +152,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     return true;
                 case R.id.action_copy:
                     mainActivity.copyTaskToClipboard(mTask);
+                    return true;
                 default:
             }
             return false;

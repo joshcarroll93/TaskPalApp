@@ -37,4 +37,5 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_dialog_email"
         app:backgroundTint="@color/ColorNavy" />
+
 </android.support.design.widget.CoordinatorLayout>

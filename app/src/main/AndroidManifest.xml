@@ -21,10 +21,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
+
         <meta-data android:name="com.google.android.geo.API_KEY"
 
             android:value= "AIzaSyDGD9tivCeeBRU2rlIEmv_2bH2I5EIMT0c">
         </meta-data>
+
         <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

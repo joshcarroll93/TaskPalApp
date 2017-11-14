@@ -13,14 +13,16 @@ public class NewTask implements Parcelable{
     private String description;
     private double latitude;
     private double longitude;
+    private String address;
     private int status;
 
-    public NewTask(int id, String title, String description, double latitude, double longitude, int status){
+    public NewTask(int id, String title, String description, double latitude, double longitude, String address, int status){
         this.id = id;
         this.title = title;
         this.description = description;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.address = address;
         this.status = status;
     }
 
@@ -30,6 +32,7 @@ public class NewTask implements Parcelable{
         description = parcel.readString();
         latitude = parcel.readDouble();
         longitude = parcel.readDouble();
+        address = parcel.readString();
         status = parcel.readInt();
     }
 
@@ -77,6 +80,10 @@ public class NewTask implements Parcelable{
     public double getLongitude(){return longitude;}
 
     public void setLongitude(double longitude){this.longitude = longitude;}
+
+    public String getAddress(){return address;}
+
+    public void setAddress(String address){this.address = address;}
 
     public int getStatus(){return status;}
 

@@ -75,6 +75,9 @@ public class LocationService extends Service {
 
     public class MyLocationListener implements LocationListener {
 
+        private NotificationCompat.Builder mBuilder;
+        private NotificationManager mNotificationManager;
+
         @Override
         public void onLocationChanged(final Location location) {
 
@@ -87,7 +90,7 @@ public class LocationService extends Service {
 
             for(int i = 0; i < taskList.size(); i++){
 
-                Log.d(TAG," Task LAT"+ taskList.get(i).getLatitude());
+                Log.d(TAG," Task LAT:"+ taskList.get(i).getLatitude());
                 Log.d(TAG," CURRENT LOCATION LAT: "+ location.getLatitude());
                 Log.d(TAG," Task Lng: "+taskList.get(i).getLongitude());
                 Log.d(TAG," CURRENT Lng: "+location.getLongitude());
@@ -103,7 +106,7 @@ public class LocationService extends Service {
 
                     sendNotification(taskList.get(i));
                     taskList.get(i).setStatus(1);
-
+                    Log.d(TAG, "GPS MATCH, Notification should fire");
                     db.updateStatus(taskList.get(i));
                     if(taskList.get(i).getStatus() == 1){
                         Log.d(TAG, "task removed");
@@ -119,17 +122,16 @@ public class LocationService extends Service {
             Log.d(TAG, "Provider Enabled: " + provider);
         }
         public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.d(TAG, "Status Changed: " + provider);
+            Log.d(TAG, "Status Changed: " + provider  + " Status: "+ status);
         }
+
         private void sendNotification(NewTask task){
 
-            NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(getApplicationContext())
-                            //.setSmallIcon(R.drawable.edit_icon)
+            mBuilder = new NotificationCompat.Builder(getApplicationContext())
+                            .setSmallIcon(R.drawable.edit_icon)
                             .setContentTitle(task.getTitle())
                             .setContentText(task.getDescription())
-                            .setLights(Color.RED, 2000, 2000)
-                            .setVibrate(new long[] { 1000, 1000, 1000 })
+                            .setVibrate(new long[] { 1000, 1000, 1000, 1000})
                             .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
                             .setAutoCancel(true);
 
@@ -137,17 +139,16 @@ public class LocationService extends Service {
             resultIntent.putExtra("Task", task);
 
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(getApplicationContext());
+
             stackBuilder.addParentStack(MainActivity.class);
+
             stackBuilder.addNextIntent(resultIntent);
-            PendingIntent resultPendingIntent =
-                    stackBuilder.getPendingIntent(
-                            0,
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                    );
+
+            PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
             mBuilder.setContentIntent(resultPendingIntent);
 
-            NotificationManager mNotificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
             mNotificationManager.notify(1, mBuilder.build());
         }

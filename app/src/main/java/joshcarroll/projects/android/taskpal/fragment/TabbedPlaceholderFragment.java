@@ -8,6 +8,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +21,7 @@ import joshcarroll.projects.android.taskpal.activity.MainActivity;
 import joshcarroll.projects.android.taskpal.adapter.RecyclerViewAdapter;
 import joshcarroll.projects.android.taskpal.data.NewTask;
 import joshcarroll.projects.android.taskpal.database.DBHandler;
+import joshcarroll.projects.android.taskpal.listener.NewTaskListener;
 
 
 /**
@@ -26,10 +31,10 @@ import joshcarroll.projects.android.taskpal.database.DBHandler;
 public class TabbedPlaceholderFragment extends Fragment {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
-    public  MainActivity mainActivity;
     public static DBHandler dbHandler;
-    ArrayList<NewTask> activeTasks;
+    public static ArrayList<NewTask> activeTasks;
     public static List<NewTask> tasks;
+    public static NewTaskListener mListener;
     public RecyclerViewAdapter mListAdapter;
     public RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -51,6 +56,11 @@ public class TabbedPlaceholderFragment extends Fragment {
         return fragment;
     }
 
+//    public void setListener(NewTaskListener listener){
+//
+//        this.mListener = listener;
+//    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -60,40 +70,76 @@ public class TabbedPlaceholderFragment extends Fragment {
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
-//
-        if(getArguments().getInt(ARG_SECTION_NUMBER) == 1){
-            allTasksIsChecked();
 
-//                Toast.makeText(getActivity(), "All Tasks", Toast.LENGTH_SHORT).show();
+
+
+
+        if(getArguments().getInt(ARG_SECTION_NUMBER) == 1){
+            allTasksIsChecked(rootView);
         }
         else if (getArguments().getInt(ARG_SECTION_NUMBER) == 2){
-            activeTasksIsChecked();
-//                Toast.makeText(getActivity(), "Active Tasks", Toast.LENGTH_SHORT).show();
+            activeTasksIsChecked(rootView);
         }
         return rootView;
     }
 
-    public void allTasksIsChecked(){
+    public void allTasksIsChecked(View view){
         Log.d("OUTPUT_DE", "all_tasks_clicked");
-        DBHandler dbHandler = new DBHandler(getContext());
-        tasks = dbHandler.getAllTasks();
 
-        mListAdapter = new RecyclerViewAdapter(getContext(), tasks);
-        mRecyclerView.setAdapter(mListAdapter);
+//        TextView textView = (TextView)view.findViewById(R.id.id_placeholder_text_field);
+        dbHandler = new DBHandler(getContext());
+
+        if(dbHandler.getAllTasks() != null){
+            //textView.setVisibility(View.INVISIBLE);
+            tasks = dbHandler.getAllTasks();
+
+            mListAdapter = new RecyclerViewAdapter(getContext(), tasks);
+            mRecyclerView.setAdapter(mListAdapter);
+        }
+//        else{
+//            textView.setVisibility(View.VISIBLE);
+//        }
     }
 
-    public void activeTasksIsChecked(){
+    public void activeTasksIsChecked(View view){
         Log.d("OUTPUT_DE", "active_tasks_clicked");
-        DBHandler dbHandler = new DBHandler(getContext());
-        List<NewTask>activeTasks = new ArrayList<>();
 
-        for(int i = 0; i < tasks.size(); i++){
-            if(tasks.get(i).getStatus() == 0){
-                activeTasks.add(tasks.get(i));
+//        TextView textView = (TextView)view.findViewById(R.id.id_placeholder_text_field);
+
+        if (dbHandler.getAllTasks() != null) {
+
+//            textView.setVisibility(View.INVISIBLE);
+            activeTasks = new ArrayList<>();
+
+            for(int i = 0; i < tasks.size(); i++){
+                if(tasks.get(i).getStatus() == 0){
+                    activeTasks.add(tasks.get(i));
+                }
             }
+            mListAdapter = new RecyclerViewAdapter(getContext(), activeTasks);
+            mRecyclerView.setAdapter(mListAdapter);
         }
-        mListAdapter = new RecyclerViewAdapter(getContext(), activeTasks);
-        mRecyclerView.setAdapter(mListAdapter);
+//        else{
+//            textView.setVisibility(View.VISIBLE);
+//
+//        }
+
+//        boolean hasTasks = mListener.hasTasks(dbHandler.getAllTasks());
+//        if(!hasTasks){
+//            textView.setVisibility(View.VISIBLE);
+//        }
+//        else{
+//            textView.setVisibility(View.INVISIBLE);
+//            activeTasks = new ArrayList<>();
+//
+//            for(int i = 0; i < tasks.size(); i++){
+//                if(tasks.get(i).getStatus() == 0){
+//                    activeTasks.add(tasks.get(i));
+//                }
+//            }
+//            mListAdapter = new RecyclerViewAdapter(getContext(), activeTasks);
+//            mRecyclerView.setAdapter(mListAdapter);
+//        }
     }
 
 }

@@ -28,11 +28,12 @@ import joshcarroll.projects.android.taskpal.listener.NewTaskListener;
 
 public class AddTaskFragment extends DialogFragment {
 
-    PlaceAutocompleteFragment autocompleteFragment;
-
-    double lat;
-    double lng;
-    View view;
+    private PlaceAutocompleteFragment autocompleteFragment;
+    private String TAG = "ADD_TASK_FRAGMENT";
+    private String mAddress;
+    private double mLatitude;
+    private double mLongitude;
+    private View view;
     private AddTaskFragment mAddTaskFragment;
     private NewTaskListener mListener;
 
@@ -80,10 +81,11 @@ public class AddTaskFragment extends DialogFragment {
 
             @Override
             public void onPlaceSelected(Place place) {
-                Log.d("Place: ", place.getName().toString());
+                Log.d(TAG , place.getName().toString());
+                mAddress = place.getAddress().toString();
                 LatLng queriedLocation = place.getLatLng();
-                lat = queriedLocation.latitude;
-                lng = queriedLocation.longitude;
+                mLatitude = queriedLocation.latitude;
+                mLongitude = queriedLocation.longitude;
             }
 
             @Override
@@ -107,10 +109,10 @@ public class AddTaskFragment extends DialogFragment {
 
                 if(title.length() > 0) {
 
-                    NewTask task = new NewTask(0, title, description, lat, lng, 0);
+                    NewTask task = new NewTask(0, title, description, mLatitude, mLongitude, mAddress, 0);
 
-                    Log.d("AddTaskFragment Lat: ", ""+lat);
-                    Log.d("AddTaskFragment Lng: ", ""+lng);
+                    Log.d("AddTaskFragment Lat: ", ""+mLatitude);
+                    Log.d("AddTaskFragment Lng: ", ""+mLongitude);
                     DBHandler db = new DBHandler(getActivity());
                     db.addTask(task);
 //                    taskListAdapter.add(task);

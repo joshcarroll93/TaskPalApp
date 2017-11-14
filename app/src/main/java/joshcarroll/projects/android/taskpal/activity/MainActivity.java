@@ -1,9 +1,13 @@
 package joshcarroll.projects.android.taskpal.activity;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -18,12 +22,13 @@ import java.util.List;
 import joshcarroll.projects.android.taskpal.R;
 import joshcarroll.projects.android.taskpal.adapter.SectionsPagerAdapter;
 import joshcarroll.projects.android.taskpal.data.NewTask;
+import joshcarroll.projects.android.taskpal.database.DBHandler;
 import joshcarroll.projects.android.taskpal.fragment.AddTaskFragment;
 import joshcarroll.projects.android.taskpal.fragment.DeleteTaskFragment;
+import joshcarroll.projects.android.taskpal.fragment.SettingsFragment;
 import joshcarroll.projects.android.taskpal.fragment.TabbedPlaceholderFragment;
 import joshcarroll.projects.android.taskpal.fragment.ViewSingleTaskFragment;
 import joshcarroll.projects.android.taskpal.listener.NewTaskListener;
-import joshcarroll.projects.android.taskpal.service.LocationService;
 
 
 public class MainActivity extends AppCompatActivity implements NewTaskListener{
@@ -38,7 +43,18 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startService(new Intent(getApplication(), LocationService.class));
+        DBHandler dbHandler = new DBHandler(getApplication());
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (!prefs.getBoolean("firstTime", false)) {
+            // <---- run your one time code here
+            //databaseSetup();
+            dbHandler.setNotification(0);
+            // mark first time has runned.
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("firstTime", true);
+            editor.apply();
+        }
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         // Set up the ViewPager with the sections adapter.
@@ -92,15 +108,18 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
 
+            SettingsFragment settingsFragment = SettingsFragment.newInstance();
+            settingsFragment.show(getFragmentManager(),"SETTINGS_FRAGMENT");
+
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
     @Override
     public void addTask(NewTask newTask) {
-        //tasks.add(newTask);
-//        //adding to all tasks
+
         TabbedPlaceholderFragment.tasks.add(newTask);
+        TabbedPlaceholderFragment.activeTasks.add(newTask);
 
         mSectionsPagerAdapter.allTasksFragment.mListAdapter.notifyItemInserted(newTask.getId());
         mSectionsPagerAdapter.allTasksFragment.mListAdapter.notifyDataSetChanged();
@@ -109,18 +128,33 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
             mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyItemInserted(newTask.getId());
             mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyDataSetChanged();
         }
+        //if()
+
     }
 
     @Override
     public void removeTask(NewTask removedTask) {
+
         TabbedPlaceholderFragment.tasks.remove(removedTask);
+        TabbedPlaceholderFragment.activeTasks.remove(removedTask);
 
         mSectionsPagerAdapter.allTasksFragment.mListAdapter.notifyItemRemoved(removedTask.getId());
         mSectionsPagerAdapter.allTasksFragment.mListAdapter.notifyDataSetChanged();
+
         if(removedTask.getStatus() == 0){
             mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyItemInserted(removedTask.getId());
             mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public boolean hasTasks(List<NewTask> tasks) {
+
+        if(tasks.size() <= 0){
+            return true;
+        }
+
+        return false;
     }
 
     public void showDeleteTaskFragment(NewTask task){
@@ -134,6 +168,5 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("Task to copy", getTask);
         clipboard.setPrimaryClip(clip);
-
     }
 }

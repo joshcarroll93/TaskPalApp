@@ -10,48 +10,83 @@
     card_view:cardCornerRadius="4dp">
 
     <RelativeLayout
+        android:padding="@dimen/activity_horizontal_margin"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:layout_height="wrap_content">
 
         <ImageView
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_centerVertical="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_centerVertical="false"
             android:layout_alignParentStart="true"
             android:src="@drawable/edit_icon"
             android:id="@+id/image_view"/>
 
         <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/image_view"
-            android:layout_marginStart="20dp">
-
-            <TextView
-                android:textColor="#000000"
-                android:textSize="20dp"
-                android:id="@+id/id_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:textColor="#000000"
-                android:textSize="18dp"
-                android:id="@+id/id_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/id_title" />
+            android:id="@+id/id_menu_layout"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true">
 
             <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:src="@drawable/three_dots"
                 android:id="@+id/card_button_menu"
-                android:layout_centerVertical="true"
-                android:layout_alignParentEnd="true"/>
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/icon_list_big" />
+        </RelativeLayout>
+
+        <TextView
+            android:layout_toEndOf="@+id/image_view"
+            android:textColor="#000000"
+            android:textSize="20dp"
+            android:id="@+id/id_title"
+            android:layout_toStartOf="@+id/button_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:textColor="#000000"
+            android:textSize="18dp"
+            android:id="@+id/id_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/button_layout"
+            android:layout_toEndOf="@+id/image_view"
+            android:layout_below="@+id/id_title" />
+
+        <RelativeLayout
+            android:layout_below="@+id/id_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/button_layout"
+            android:layout_toEndOf="@+id/image_view"
+            android:id="@+id/expanding_card_layout">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/id_address"
+                android:textColor="#000000"
+                android:textSize="18dp" />
 
         </RelativeLayout>
-    </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="80dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/button_layout">
 
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/down_arrow"
+                android:id="@+id/id_more_less_button"
+                android:layout_marginEnd="59dp"
+                android:layout_alignParentEnd="true" />
+        </RelativeLayout>
+    </RelativeLayout>
 </android.support.v7.widget.CardView>
