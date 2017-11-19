@@ -8,8 +8,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.util.List;
-
 import joshcarroll.projects.android.taskpal.R;
 import joshcarroll.projects.android.taskpal.data.NewTask;
 import joshcarroll.projects.android.taskpal.database.DBHandler;
@@ -29,13 +27,14 @@ public class DeleteTaskFragment extends DialogFragment {
 
         return dialogFragment;
     }
+
     public void setListener(NewTaskListener listener){
         this.mListener = listener;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        View view =  inflater.inflate(R.layout.fragment_delete_task, null);
+        View view =  inflater.inflate(R.layout.fragment_delete_task, container);
 
 
         Button deleteButton =(Button)view.findViewById(R.id.delete_button);

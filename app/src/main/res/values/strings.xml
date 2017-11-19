@@ -7,7 +7,22 @@
     <string name="delete_string">Delete</string>
     <string name="copy_string">Copy</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="setting_string"><u> SETTINGS </u></string>
+
+    <string name="pen_image">Pen Image</string>
+    <string name="card_image">More Image</string>
+    <string name="more_less">More/Less Image</string>
+
+    <string name="add_task">Add Task</string>
+    <string name="title">Title</string>
+    <string name="desc">Description</string>
+    <string name="submit">Submit</string>
+    <string name="ok">OK</string>
+    <string name="delete_task">Delete Task?</string>
+    <string name="cancel">Cancel</string>
+    <string name="notifications">Notifications</string>
+    <string name="tilte">Title: </string>
+    <string name="description">Description: </string>
+    <string name="address">Address: </string>
 </resources>

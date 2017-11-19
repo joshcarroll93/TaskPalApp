@@ -5,12 +5,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
-import joshcarroll.projects.android.taskpal.activity.MainActivity;
 import joshcarroll.projects.android.taskpal.fragment.TabbedPlaceholderFragment;
 
-/**
- * Created by Josh on 26/10/2017.
- */
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter{
     public TabbedPlaceholderFragment allTasksFragment;

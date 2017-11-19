@@ -10,9 +10,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="25dp"
+        android:textSize="25sp"
         android:textColor="@color/ColorNavy"
-        android:text="Delete Task?"
+        android:text="@string/delete_task"
         android:id="@+id/are_you_sure"/>
 
     <LinearLayout
@@ -21,21 +21,22 @@
         android:orientation="horizontal">
 
         <Button
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cancel_button"
-            android:text="Cancel"
+            android:text="@string/cancel"
             android:layout_marginTop="20dp"
             android:layout_weight="1"
             android:background="@color/colorGreen"
             android:textColor="@color/colorWhite"
-            android:layout_marginRight="10dp" />
+            android:layout_marginEnd="10dp" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/delete_button"
-            android:text="OK"
+            android:text="@string/ok"
             android:layout_marginTop="20dp"
             android:layout_weight="1"
             android:textColor="@color/colorWhite"

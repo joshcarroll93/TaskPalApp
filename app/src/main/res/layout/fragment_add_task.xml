@@ -11,8 +11,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Task"
-        android:textSize="20dp"
+        android:text="@string/add_task"
+        android:textSize="20sp"
         android:textColor="@color/ColorNavy"
         android:layout_marginBottom="25dp"/>
     <RelativeLayout
@@ -23,7 +23,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColorHint="#16a085"
-            android:hint="Title">
+            android:labelFor="@+id/task_title_field"
+            android:hint="@string/title">
 
             <EditText
                 android:textColor="#2c3e50"
@@ -36,10 +37,10 @@
             android:id="@+id/clearable_button_add_title"
             android:layout_width="30dip"
             android:layout_height="30dip"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:background="@drawable/clear_button"
             android:layout_centerVertical="true"
-            android:layout_marginRight="5dip"/>
+            android:layout_margin="5dip"/>
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -50,7 +51,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColorHint="#16a085"
-            android:hint="Description">
+            android:labelFor="@+id/task_desc_field"
+            android:hint="@string/desc">
 
             <EditText
                 android:textColor="#2c3e50"
@@ -64,10 +66,10 @@
             android:id="@+id/clearable_button_add_desc"
             android:layout_width="30dip"
             android:layout_height="30dip"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:background="@drawable/clear_button"
             android:layout_centerVertical="false"
-            android:layout_marginRight="5dip"
+            android:layout_marginEnd="5dip"
             android:layout_marginTop="12dp"/>
 
     </RelativeLayout>
@@ -81,7 +83,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/submit_task_button"
-        android:text="submit"
+        android:text="@string/submit"
         android:background="@color/colorGreen"
         android:textColor="@color/colorWhite"/>
 </LinearLayout>

@@ -1,9 +1,5 @@
 package joshcarroll.projects.android.taskpal.database;
 
-/**
- * Created by Josh on 22/10/2017.
- */
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -17,14 +13,9 @@ import java.util.List;
 import joshcarroll.projects.android.taskpal.data.NewTask;
 import joshcarroll.projects.android.taskpal.data.Setting;
 
-
-/**
- * Created by Josh on 29/06/2017.
- */
-
 public class DBHandler extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "ToDoList";
     private static final String TASK_TABLE_NAME = "Tasks";
     private static final String SETTING_TABLE_NAME = "Settings";
@@ -39,7 +30,6 @@ public class DBHandler extends SQLiteOpenHelper {
 
     private static final String KEY_NOTIFICATION_SETTING = "notification_setting";
 
-    private String createTable = "CREATE TABLE ";
 
     public DBHandler(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -47,6 +37,8 @@ public class DBHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+
+        String createTable = "CREATE TABLE ";
 
         String CREATE_TASK_TABLE = createTable + TASK_TABLE_NAME + "("
                 + KEY_ID + " INTEGER PRIMARY KEY, "
@@ -56,18 +48,44 @@ public class DBHandler extends SQLiteOpenHelper {
                 + KEY_LONGITUDE + " DOUBLE PRECISION, "
                 + KEY_ADDRESS + " TEXT, "
                 + KEY_FLAG + " INTEGER "
-                +")";
+                + ")";
 
         String CREATE_SETTINGS_TABLE = createTable + SETTING_TABLE_NAME + "("
-                +KEY_ID + " INTEGER , "
-                +KEY_NOTIFICATION_SETTING + " INTEGER "
-                +")";
+                + KEY_ID + " INTEGER PRIMARY KEY, "
+                + KEY_NOTIFICATION_SETTING + " INTEGER "
+                + ")";
+
+
+        sqLiteDatabase.execSQL(CREATE_SETTINGS_TABLE);
 
         sqLiteDatabase.execSQL(CREATE_TASK_TABLE);
 
-        sqLiteDatabase.execSQL(CREATE_SETTINGS_TABLE);
+
     }
 
+    public boolean isTableExists(String tableName, boolean openDb) {
+        SQLiteDatabase mDatabase = this.getReadableDatabase();
+        if(openDb) {
+            if(mDatabase == null || !mDatabase.isOpen()) {
+                mDatabase = getReadableDatabase();
+            }
+
+            if(!mDatabase.isReadOnly()) {
+                mDatabase.close();
+                mDatabase = getReadableDatabase();
+            }
+        }
+
+        Cursor cursor = mDatabase.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"+tableName+"'", null);
+        if(cursor!=null) {
+            if(cursor.getCount()>0) {
+                cursor.close();
+                return true;
+            }
+            cursor.close();
+        }
+        return false;
+    }
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
 
@@ -128,7 +146,7 @@ public class DBHandler extends SQLiteOpenHelper {
     }
     public List<NewTask> getAllTasks() {
 
-        List<NewTask> taskList = new ArrayList<NewTask>();
+        List<NewTask> taskList = new ArrayList<>();
         String selectQuery = "SELECT * FROM "+ TASK_TABLE_NAME;
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -185,25 +203,22 @@ public class DBHandler extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         try{
-            do{
-
-                if (cursor.moveToFirst()) {
-
+            if (cursor.moveToFirst()) {
+                do{
                     Setting settings = new Setting(
                             Integer.parseInt(cursor.getString(0)),
                             Integer.parseInt(cursor.getString(1))
                     );
                     settingList.add(settings);
                     notification = settingList.get(0).getNotification();
-                }
-            }while (cursor.moveToNext());
+                }while (cursor.moveToNext());
+            }
         }
         catch (IllegalStateException ise){
                 ise.printStackTrace();
         }
         cursor.close();
-
-
+        db.close();
         return notification;
     }
 }

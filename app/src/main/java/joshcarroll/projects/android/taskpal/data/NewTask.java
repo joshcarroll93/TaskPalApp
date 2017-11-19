@@ -3,9 +3,7 @@ package joshcarroll.projects.android.taskpal.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by Josh on 22/10/2017.
- */
+
 
 public class NewTask implements Parcelable{
     private int id;

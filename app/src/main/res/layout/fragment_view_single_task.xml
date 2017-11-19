@@ -18,14 +18,14 @@
         android:layout_height="wrap_content"
         android:textColor="@color/ColorNavy"
         android:textSize="22sp"
-        android:text="Title: " />
+        android:text="" />
     <TextView
-        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
         android:id="@+id/title_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:text="title"
+        android:textSize="20sp"
+        android:text="@string/title"
         android:textColor="@color/ColorNavy"
         android:layout_marginBottom="25dp"/>
 
@@ -35,29 +35,27 @@
         android:layout_height="wrap_content"
         android:textColor="@color/ColorNavy"
         android:textSize="22sp"
-        android:text="Description: " />
+        android:text="@string/description" />
     <TextView
-        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
         android:id="@+id/description_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:textColor="@color/ColorNavy"
-        android:text="desc"
         android:layout_marginBottom="25dp"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/ColorNavy"
         android:textSize="22sp"
-        android:text="Address: " />
+        android:text="@string/address" />
     <TextView
-        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
         android:id="@+id/address_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:text="address"
+        android:textSize="20sp"
         android:textColor="@color/ColorNavy"
         android:layout_marginBottom="25dp"/>
 

@@ -2,7 +2,6 @@ package joshcarroll.projects.android.taskpal.fragment;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -16,20 +15,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import joshcarroll.projects.android.taskpal.R;
+import joshcarroll.projects.android.taskpal.activity.MainActivity;
 import joshcarroll.projects.android.taskpal.database.DBHandler;
 import joshcarroll.projects.android.taskpal.service.LocationService;
 
 public class SettingsFragment extends DialogFragment {
 
-    private View view;
-    private TextView mTextView;
-    private SwitchCompat mSwitch;
-
     public static SettingsFragment newInstance(){
 
-        SettingsFragment settingsFragment = new SettingsFragment();
-
-        return settingsFragment;
+        return new SettingsFragment();
     }
 
     @Override
@@ -51,7 +45,7 @@ public class SettingsFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        view =  inflater.inflate(R.layout.fragment_settings, null);
+        View view =  inflater.inflate(R.layout.fragment_settings, container);
 
         onCreateFields(view);
 
@@ -62,8 +56,10 @@ public class SettingsFragment extends DialogFragment {
 
         final DBHandler dbHandler = new DBHandler(getActivity());
 
-       // mTextView = (TextView)view.findViewById(R.id.id_text_view_notifications);
-        mSwitch = (SwitchCompat)view.findViewById(R.id.id_notifications_switch);
+        final MainActivity mainActivity = (MainActivity) getActivity();
+        TextView textView = (TextView)view.findViewById(R.id.id_text_view_notifications);
+        SwitchCompat mSwitch = (SwitchCompat)view.findViewById(R.id.id_notifications_switch);
+
 
         if(dbHandler.getNotificationSetting()== 1){
             mSwitch.setChecked(true);
@@ -76,6 +72,7 @@ public class SettingsFragment extends DialogFragment {
                     //starting location service
                     getActivity().startService(new Intent(getActivity(), LocationService.class));
                     dbHandler.setNotification(1);
+                    mainActivity.checkIsLocationEnabled();
                     Toast.makeText(getActivity(), "Notifications On", Toast.LENGTH_LONG).show();
                 }else{
                     getActivity().stopService(new Intent(getActivity(), LocationService.class));
@@ -84,6 +81,5 @@ public class SettingsFragment extends DialogFragment {
                 }
             }
         });
-
     }
 }

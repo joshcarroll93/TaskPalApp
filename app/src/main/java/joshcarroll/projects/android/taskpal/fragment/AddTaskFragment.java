@@ -34,12 +34,11 @@ public class AddTaskFragment extends DialogFragment {
     private double mLatitude;
     private double mLongitude;
     private View view;
-    private AddTaskFragment mAddTaskFragment;
     private NewTaskListener mListener;
 
-    public static AddTaskFragment newInstance() {
-        //AddTaskFragment dialogFragment = new AddTaskFragment();
-        return new AddTaskFragment();
+
+    public AddTaskFragment(){
+
     }
     public void setListener(NewTaskListener listener){
 
@@ -55,7 +54,7 @@ public class AddTaskFragment extends DialogFragment {
                 parent.removeView(view);
         }
 
-        view =  inflater.inflate(R.layout.fragment_add_task, null);
+        view =  inflater.inflate(R.layout.fragment_add_task, container);
 
         onCreateFields(view);
 

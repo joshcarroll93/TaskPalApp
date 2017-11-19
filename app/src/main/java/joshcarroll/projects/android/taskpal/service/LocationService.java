@@ -6,7 +6,6 @@ import android.app.Service;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -24,9 +23,6 @@ import joshcarroll.projects.android.taskpal.activity.MainActivity;
 import joshcarroll.projects.android.taskpal.data.NewTask;
 import joshcarroll.projects.android.taskpal.database.DBHandler;
 
-/**
- * Created by Josh on 22/10/2017.
- */
 
 public class LocationService extends Service {
 
@@ -73,7 +69,7 @@ public class LocationService extends Service {
         }
     }
 
-    public class MyLocationListener implements LocationListener {
+    private class MyLocationListener implements LocationListener {
 
         private NotificationCompat.Builder mBuilder;
         private NotificationManager mNotificationManager;

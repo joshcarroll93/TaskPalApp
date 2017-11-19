@@ -3,14 +3,12 @@ package joshcarroll.projects.android.taskpal.adapter;
 import android.content.Context;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -19,18 +17,12 @@ import java.util.List;
 import joshcarroll.projects.android.taskpal.R;
 import joshcarroll.projects.android.taskpal.activity.MainActivity;
 import joshcarroll.projects.android.taskpal.data.NewTask;
-import joshcarroll.projects.android.taskpal.fragment.DeleteTaskFragment;
 
-/**
- * Created by Josh on 22/10/2017.
- */
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
     private Context mContext;
     private List<NewTask> mTasks;
-    private int mExpandedPosition = -1;
-    private View newView;
 
     public RecyclerViewAdapter(Context context, List<NewTask> tasks){
 
@@ -49,9 +41,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_item, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view);
 
-        return viewHolder;
+        return new ViewHolder(view);
     }
 
     @Override
@@ -72,20 +63,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 popup.show();
             }
         });
-
-
-
-//        taskViewHolder.mImageSettingIcon.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                PopupMenu popup = new PopupMenu(mContext, v);
-//                MenuInflater inflater = popup.getMenuInflater();
-//                inflater.inflate(R.menu.card_menu, popup.getMenu());
-//                popup.setOnMenuItemClickListener(new MyMenuItemClickListener(mTasks.get(position)));
-//                popup.show();
-//            }
-//        });
     }
 
 
@@ -131,11 +108,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             });
         }
     }
-    class MyMenuItemClickListener implements PopupMenu.OnMenuItemClickListener {
+    private class MyMenuItemClickListener implements PopupMenu.OnMenuItemClickListener {
 
         private NewTask mTask;
 
-        public MyMenuItemClickListener(NewTask task) {
+        private MyMenuItemClickListener(NewTask task) {
             mTask = task;
         }
 
