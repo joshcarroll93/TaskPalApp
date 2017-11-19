@@ -21,6 +21,7 @@ import joshcarroll.projects.android.taskpal.service.LocationService;
 
 public class SettingsFragment extends DialogFragment {
 
+
     public static SettingsFragment newInstance(){
 
         return new SettingsFragment();
@@ -58,13 +59,12 @@ public class SettingsFragment extends DialogFragment {
 
         final MainActivity mainActivity = (MainActivity) getActivity();
         TextView textView = (TextView)view.findViewById(R.id.id_text_view_notifications);
-        SwitchCompat mSwitch = (SwitchCompat)view.findViewById(R.id.id_notifications_switch);
-
+        SwitchCompat switchCompat = (SwitchCompat)view.findViewById(R.id.id_notifications_switch);
 
         if(dbHandler.getNotificationSetting()== 1){
-            mSwitch.setChecked(true);
+            switchCompat.setChecked(true);
         }
-        mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
 
@@ -81,5 +81,6 @@ public class SettingsFragment extends DialogFragment {
                 }
             }
         });
+
     }
 }
