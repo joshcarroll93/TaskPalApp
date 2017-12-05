@@ -124,13 +124,17 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void editTask(NewTask task){
+    public void editTask(NewTask task, int position){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_TITLE, task.getTitle());
         values.put(KEY_DESCRIPTION, task.getDescription());
+        values.put(KEY_LATITUDE, task.getLatitude());
+        values.put(KEY_LONGITUDE, task.getLongitude());
+        values.put(KEY_ADDRESS, task.getAddress());
+        values.put(KEY_FLAG, task.getStatus());
 
-        db.update(TASK_TABLE_NAME, values, "id="+task.getId(), null);
+        db.update(TASK_TABLE_NAME, values, "id="+position, null);
         db.close();
     }
 
@@ -172,6 +176,7 @@ public class DBHandler extends SQLiteOpenHelper {
         }
         cursor.close();
         db.close();
+
         // return task list
         return taskList;
 
@@ -180,7 +185,6 @@ public class DBHandler extends SQLiteOpenHelper {
     public void setNotification(int position){
         //0 is off 1 is on
         SQLiteDatabase db = this.getWritableDatabase();
-
 
         db.delete(SETTING_TABLE_NAME, KEY_ID + " = ?",
                 new String[] { String.valueOf(0) });

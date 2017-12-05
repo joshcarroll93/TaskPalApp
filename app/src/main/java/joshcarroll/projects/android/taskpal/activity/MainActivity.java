@@ -1,6 +1,8 @@
 package joshcarroll.projects.android.taskpal.activity;
 
 import android.Manifest;
+import android.support.v7.app.ActionBar;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -9,6 +11,7 @@ import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -42,6 +45,7 @@ import joshcarroll.projects.android.taskpal.data.NewTask;
 import joshcarroll.projects.android.taskpal.database.DBHandler;
 import joshcarroll.projects.android.taskpal.fragment.AddTaskFragment;
 import joshcarroll.projects.android.taskpal.fragment.DeleteTaskFragment;
+import joshcarroll.projects.android.taskpal.fragment.EditTaskFragment;
 import joshcarroll.projects.android.taskpal.fragment.SettingsFragment;
 import joshcarroll.projects.android.taskpal.fragment.TabbedPlaceholderFragment;
 import joshcarroll.projects.android.taskpal.fragment.ViewSingleTaskFragment;
@@ -51,70 +55,43 @@ import joshcarroll.projects.android.taskpal.listener.NewTaskListener;
 public class MainActivity extends AppCompatActivity implements NewTaskListener{
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
-//    private List<NewTask> tasks;
     private String TAG = "MAIN_ACTIVITY";
+    public ActionBar actionBar;
+    public Menu menu;
+    FloatingActionButton fab;
     public static final int MY_PERMISSIONS_REQUEST_COURSE_LOCATION = 2;
+    private MenuItem menuItem;
+
+    @Override
+    public void onBackPressed() {
+        actionBar.setTitle(R.string.app_name);
+
+        fab.setVisibility(View.VISIBLE);
+
+        if (menuItem != null) {
+            menuItem.setVisible(true);
+        }
+
+        super.onBackPressed();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        actionBar = getSupportActionBar();
 
         DBHandler dbHandler = new DBHandler(getApplication());
 
-        if (ContextCompat.checkSelfPermission(MainActivity.this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION)) {
-
-                Log.d(TAG, "Location Permission Granted");
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-            } else {
-
-                // No explanation needed, we can request the permission.
-
-                ActivityCompat.requestPermissions(MainActivity.this,
-                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_COURSE_LOCATION
-                );
-            }
-        }
-
-        if(doesDatabaseExist(getApplicationContext(), "ToDoList")){
-            Log.d(TAG, "Table Exists");
-        }
-        else {
-            Log.d(TAG, "Table does not exist");
-        }
-        if(dbHandler.isTableExists("Tasks", true)){
-
-            Log.d("DB_HELPER", "Tasks does exist");
-        }
-        else{
-            Log.d("DB_HELPER", "Tasks does NOT exist");
-        }
-        if(dbHandler.isTableExists("Settings", true)){
-
-            Log.d("DB_HELPER", "Settings does exist");
-        }
-        else{
-            Log.d("DB_HELPER", "Settings does NOT exist");
-        }
-
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         if (!prefs.getBoolean("firstTime", false)) {
             // <---- run your one time code here
-            //databaseSetup();
-//            dbHandler.setNotification(0);
-            NewTask task = new NewTask(0, "Title", "Description", 0.0, 0.0, "Address", 1);
-            dbHandler.addTask(task);
-            // mark first time has runned.
+            dbHandler.setNotification(0);
+//            NewTask task = new NewTask(0, "Title", "Description", 0.0, 0.0, "Address", 1);
+//            dbHandler.addTask(task);
+
+            // mark first time has ran.
             SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean("firstTime", true);
             editor.apply();
@@ -128,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setImageResource(R.drawable.edit_icon_white);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,46 +128,17 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
             }
 
         }else{
-            Log.d(TAG, "Parcelable Task is null");
+            Log.i(TAG, "Parcelable Task is null");
         }
     }
-    private static boolean doesDatabaseExist(Context context, String dbName) {
-        File dbFile = context.getDatabasePath(dbName);
-        File file  = context.getDatabasePath("Settings");
 
-        Log.d("MAIN_ACTIVITY", file.toString());
-        return dbFile.exists();
-    }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
-
-        DBHandler dbHandler = new DBHandler(getApplication());
-
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_COURSE_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                    Toast.makeText(getApplicationContext(), "You can turn on notifications now", Toast.LENGTH_LONG).show();
-
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    dbHandler.setNotification(0);
-                }
-            }
-        }
-    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.settings_menu, menu);
+
+        this.menu = menu;
 
         return true;
     }
@@ -207,8 +155,19 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
 
             SettingsFragment settingsFragment = SettingsFragment.newInstance();
 
-            settingsFragment.show(getFragmentManager(),"SETTINGS_FRAGMENT");
+            FragmentManager manager = getFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
+            transaction.replace(R.id.setting_fragment,settingsFragment,"SETTINGS_FRAGMENT");
+            transaction.addToBackStack("SettingFragment");
 
+            transaction.commit();
+
+            actionBar.setTitle("Settings");
+
+            fab.setVisibility(View.INVISIBLE);
+
+            menuItem = item;
+            menuItem.setVisible(false);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -216,8 +175,11 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
     @Override
     public void addTask(NewTask newTask) {
 
-        TabbedPlaceholderFragment.tasks.add(newTask);
-        TabbedPlaceholderFragment.activeTasks.add(newTask);
+        if(TabbedPlaceholderFragment.tasks != null)
+            TabbedPlaceholderFragment.tasks.add(newTask);
+
+        if(TabbedPlaceholderFragment.activeTasks!= null)
+            TabbedPlaceholderFragment.activeTasks.add(newTask);
 
         mSectionsPagerAdapter.allTasksFragment.mListAdapter.notifyItemInserted(newTask.getId());
         mSectionsPagerAdapter.allTasksFragment.mListAdapter.notifyDataSetChanged();
@@ -226,8 +188,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
             mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyItemInserted(newTask.getId());
             mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyDataSetChanged();
         }
-        //if()
-
     }
 
     @Override
@@ -244,12 +204,37 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
             mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyDataSetChanged();
         }
     }
+    @Override
+    public void editTask(NewTask task){
+        TabbedPlaceholderFragment.tasks.remove(task);
+        TabbedPlaceholderFragment.activeTasks.remove(task);
 
+        mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyItemRemoved(task.getId());
+        mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyDataSetChanged();
+
+        TabbedPlaceholderFragment.tasks.add(task);
+        TabbedPlaceholderFragment.activeTasks.add(task);
+
+        if(task.getStatus() == 0){
+            mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyItemInserted(task.getId());
+            mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyDataSetChanged();
+        }
+    }
+    public void showEditTaskFragment(NewTask task){
+
+        EditTaskFragment editTaskFragment = EditTaskFragment.newInstance();
+        editTaskFragment.setListener(MainActivity.this);
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("TASK_TO_EDIT", task);
+        editTaskFragment.setArguments(bundle);
+        editTaskFragment.show(getFragmentManager(), "EDIT_TASK_FRAGMENT");
+    }
     public void showDeleteTaskFragment(NewTask task){
 
         DeleteTaskFragment deleteFragment = DeleteTaskFragment.newInstance(task);
         deleteFragment.setListener(MainActivity.this);
-        deleteFragment.show(getFragmentManager(), "CONFIRM_DELETE_FRAGMENT");
+        deleteFragment.show(getFragmentManager(), "DELETE_TASK_FRAGMENT");
     }
     public void copyTaskToClipboard(NewTask task){
         String getTask = task.getTitle() + "\n" + task.getDescription();
@@ -258,57 +243,5 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
         clipboard.setPrimaryClip(clip);
     }
 
-    public void displayLocationSettingsRequest(Context context) {
-        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
-                .addApi(LocationServices.API).build();
-        googleApiClient.connect();
 
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(10000 / 2);
-
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-        builder.setAlwaysShow(true);
-
-        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-            @Override
-            public void onResult(@NonNull LocationSettingsResult result) {
-                final Status status = result.getStatus();
-                switch (status.getStatusCode()) {
-                    case LocationSettingsStatusCodes.SUCCESS:
-                        Log.i(TAG, "All location settings are satisfied.");
-                        break;
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to upgrade location settings ");
-
-                        try {
-                            // Show the dialog by calling startResolutionForResult(), and check the result
-                            // in onActivityResult().
-                            status.startResolutionForResult(MainActivity.this, 1);
-                        } catch (IntentSender.SendIntentException e) {
-                            Log.i(TAG, "PendingIntent unable to execute request.");
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.");
-                        break;
-                }
-            }
-        });
-    }
-    public void checkIsLocationEnabled(){
-
-        LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        boolean gps_enabled = false;
-
-        try {
-            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch(Exception ex) {ex.printStackTrace();}
-
-        if(!gps_enabled) {
-            displayLocationSettingsRequest(getApplication());
-        }
-    }
 }

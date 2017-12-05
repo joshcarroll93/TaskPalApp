@@ -10,6 +10,5 @@
 
     <style name="dialog_theme" parent="android:Theme" >
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">false</item>
     </style>
 </resources>

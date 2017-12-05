@@ -4,6 +4,8 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +37,6 @@ public class AddTaskFragment extends DialogFragment {
     private double mLongitude;
     private View view;
     private NewTaskListener mListener;
-
 
     public AddTaskFragment(){
 
@@ -85,47 +86,56 @@ public class AddTaskFragment extends DialogFragment {
                 LatLng queriedLocation = place.getLatLng();
                 mLatitude = queriedLocation.latitude;
                 mLongitude = queriedLocation.longitude;
+
             }
 
             @Override
             public void onError(Status status) {
+
                 Log.d("Status: ", status.toString());
             }
+
         });
 
         final EditText titleField = (EditText)view.findViewById(R.id.task_title_field);
+        titleField.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+
         final EditText descField = (EditText)view.findViewById(R.id.task_desc_field);
-        final Button clearTitle = (Button)view.findViewById(R.id.clearable_button_add_title);
-        final Button clearDesc = (Button)view.findViewById(R.id.clearable_button_add_desc);
+        descField.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+
+        final Button clearTitle = (Button)view.findViewById(R.id.clear_button_add_title);
+        final Button clearDesc = (Button)view.findViewById(R.id.clear_button_add_desc);
         Button submitButton = (Button)view.findViewById(R.id.submit_task_button);
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                //Here goes the place for adding the stuff to your
                 final String title = titleField.getText().toString();
                 final String description = descField.getText().toString();
 
-                if(title.length() > 0) {
+
+                if(title.length() > 0 && mAddress != null) {
 
                     NewTask task = new NewTask(0, title, description, mLatitude, mLongitude, mAddress, 0);
 
                     Log.d("AddTaskFragment Lat: ", ""+mLatitude);
                     Log.d("AddTaskFragment Lng: ", ""+mLongitude);
                     DBHandler db = new DBHandler(getActivity());
+
                     db.addTask(task);
-//                    taskListAdapter.add(task);
+//                    TabbedPlaceholderFragment.showRecyclerView();
                     mListener.addTask(task);
 
                     dismiss();
                 }else{
-                    Toast.makeText(getActivity(), "you must give your task a title",   Toast.LENGTH_LONG).show();
+                    Snackbar.make(view, "You must give your task a title and address!", Snackbar.LENGTH_LONG).show();
                 }
             }
         });
         clearTitle.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                titleField.requestFocus();
                 titleField.setText("");
             }
         });
@@ -133,6 +143,7 @@ public class AddTaskFragment extends DialogFragment {
         clearDesc.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                descField.requestFocus();
                 descField.setText("");
             }
         });

@@ -9,6 +9,7 @@ import joshcarroll.projects.android.taskpal.fragment.TabbedPlaceholderFragment;
 
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter{
+
     public TabbedPlaceholderFragment allTasksFragment;
     public TabbedPlaceholderFragment activeTasksFragment;
 

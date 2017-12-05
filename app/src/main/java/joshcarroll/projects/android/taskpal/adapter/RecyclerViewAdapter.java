@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import joshcarroll.projects.android.taskpal.R;
@@ -33,16 +34,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public int getItemCount() {
 
+        if(mTasks != null)
         return mTasks.size();
+
+        return 0;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_item, parent, false);
 
-        return new ViewHolder(view);
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.card_item, parent, false));
     }
 
     @Override
@@ -65,7 +68,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         });
     }
 
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView mTitle;
@@ -76,7 +78,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         private ImageView mUpDownIcon;
         private RelativeLayout mExpandedCardLayout;
         private RelativeLayout mMenuLayout;
-
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -122,7 +123,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             switch (menuItem.getItemId()) {
                 case R.id.action_edit:
-                    //mainActivity.showEditTaskFragment();
+                    mainActivity.showEditTaskFragment(mTask);
                     return true;
                 case R.id.action_delete:
                     mainActivity.showDeleteTaskFragment(mTask);

@@ -5,9 +5,7 @@
     android:layout_gravity="center"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp"
-    android:elevation="10dp"
-    card_view:cardCornerRadius="4dp">
+    android:layout_margin="10dp">
 
     <RelativeLayout
         android:padding="@dimen/activity_horizontal_margin"
@@ -34,11 +32,11 @@
             <ImageView
                 android:contentDescription="@string/card_image"
                 android:id="@+id/card_button_menu"
-                android:layout_width="26dp"
-                android:layout_height="26dp"
+                android:layout_width="36dp"
+                android:layout_height="28dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
-                android:src="@drawable/icon_list_big" />
+                android:src="@drawable/icon_list" />
         </RelativeLayout>
 
         <TextView

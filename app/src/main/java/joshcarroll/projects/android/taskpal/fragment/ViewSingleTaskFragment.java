@@ -23,8 +23,6 @@ import joshcarroll.projects.android.taskpal.data.NewTask;
 public class ViewSingleTaskFragment extends DialogFragment {
 
     private NewTask newTask;
-    List<Address> addresses;
-    String address;
 
     public static ViewSingleTaskFragment newInstance(NewTask task) {
         ViewSingleTaskFragment dialogFragment = new ViewSingleTaskFragment();
@@ -49,20 +47,6 @@ public class ViewSingleTaskFragment extends DialogFragment {
         TextView descriptionField = (TextView)view.findViewById(R.id.description_id);
         TextView addressField = (TextView)view.findViewById(R.id.address_id);
 
-        Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
-        try {
-            addresses = geocoder.getFromLocation(newTask.getLatitude(), newTask.getLongitude(), 1);
-            Log.d("AddressList Size: ", "" + addresses.size());
-        } catch (IOException io) {
-            io.printStackTrace();
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-        }
-        if(addresses != null){
-
-            address = addresses.get(0).getAddressLine(0);
-
-        }
         titleField.setText(newTask.getTitle());
 
         if(newTask.getDescription().length() > 0){
@@ -72,9 +56,9 @@ public class ViewSingleTaskFragment extends DialogFragment {
         else{
             descriptionField.setText("Description Not Found.");
         }
-        if(address!=null) {
-            addressField.setText(address);
-            Log.d("ViewTaskFragment:", ""+newTask.getLatitude() + "\n" + newTask.getLongitude());
+
+        if(newTask.getAddress().length() > 0 ) {
+            addressField.setText(newTask.getAddress());
         }
         else{
             addressField.setText("Address Not Found.");

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -34,10 +35,13 @@ public class TabbedPlaceholderFragment extends Fragment {
     public static DBHandler dbHandler;
     public static ArrayList<NewTask> activeTasks;
     public static List<NewTask> tasks;
-    public static NewTaskListener mListener;
+
     public RecyclerViewAdapter mListAdapter;
-    public RecyclerView mRecyclerView;
+    RecyclerView mRecyclerView;
+
     private RecyclerView.LayoutManager mLayoutManager;
+    private String TAG = "TABBED_PLACEHOLDER_FRAG";
+    TextView mTextViewPlaceHolder;
 
     public TabbedPlaceholderFragment() {
     }
@@ -56,14 +60,13 @@ public class TabbedPlaceholderFragment extends Fragment {
         return fragment;
     }
 
-//    public void setListener(NewTaskListener listener){
-//
-//        this.mListener = listener;
-//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        dbHandler = new DBHandler(getContext());
+
         View rootView = inflater.inflate(R.layout.fragment_tabbed_placeholder, container, false);
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.my_recycler_view);
@@ -72,75 +75,75 @@ public class TabbedPlaceholderFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
 
-
+        mTextViewPlaceHolder = (TextView)rootView.findViewById(R.id.placeholder_tv);
+        mTextViewPlaceHolder.setVisibility(View.INVISIBLE);
 
         if(getArguments().getInt(ARG_SECTION_NUMBER) == 1){
-            allTasksIsChecked(rootView);
+            allTasksIsChecked();
         }
         else if (getArguments().getInt(ARG_SECTION_NUMBER) == 2){
-            activeTasksIsChecked(rootView);
+            activeTasksIsChecked();
         }
         return rootView;
     }
 
-    public void allTasksIsChecked(View view){
-        Log.d("OUTPUT_DE", "all_tasks_clicked");
+    public  void allTasksIsChecked(){
+        Log.d(TAG, "all_tasks_clicked");
 
-//        TextView textView = (TextView)view.findViewById(R.id.id_placeholder_text_field);
-        dbHandler = new DBHandler(getContext());
+        if(dbHandler.getAllTasks() != null && !dbHandler.getAllTasks().isEmpty()){
 
-        if(dbHandler.getAllTasks() != null){
-            //textView.setVisibility(View.INVISIBLE);
+            showRecyclerView();
+
             tasks = dbHandler.getAllTasks();
 
             mListAdapter = new RecyclerViewAdapter(getContext(), tasks);
             mRecyclerView.setAdapter(mListAdapter);
+
+        }else{
+
+            tasks = new ArrayList<NewTask>();
+
+            showTextViewPlaceHolder();
+            mListAdapter = new RecyclerViewAdapter(getContext(), tasks);
+            mRecyclerView.setAdapter(mListAdapter);
         }
-//        else{
-//            textView.setVisibility(View.VISIBLE);
-//        }
     }
 
-    public void activeTasksIsChecked(View view){
-        Log.d("OUTPUT_DE", "active_tasks_clicked");
+    public void activeTasksIsChecked() {
+        Log.d(TAG, "active_tasks_clicked");
 
-//        TextView textView = (TextView)view.findViewById(R.id.id_placeholder_text_field);
+        if (dbHandler.getAllTasks() != null && !dbHandler.getAllTasks().isEmpty()) {
 
-        if (dbHandler.getAllTasks() != null) {
+            showRecyclerView();
 
-//            textView.setVisibility(View.INVISIBLE);
             activeTasks = new ArrayList<>();
 
-            for(int i = 0; i < tasks.size(); i++){
-                if(tasks.get(i).getStatus() == 0){
+            for (int i = 0; i < tasks.size(); i++) {
+                if (tasks.get(i).getStatus() == 0) {
                     activeTasks.add(tasks.get(i));
                 }
             }
             mListAdapter = new RecyclerViewAdapter(getContext(), activeTasks);
             mRecyclerView.setAdapter(mListAdapter);
-        }
-//        else{
-//            textView.setVisibility(View.VISIBLE);
-//
-//        }
 
-//        boolean hasTasks = mListener.hasTasks(dbHandler.getAllTasks());
-//        if(!hasTasks){
-//            textView.setVisibility(View.VISIBLE);
-//        }
-//        else{
-//            textView.setVisibility(View.INVISIBLE);
-//            activeTasks = new ArrayList<>();
-//
-//            for(int i = 0; i < tasks.size(); i++){
-//                if(tasks.get(i).getStatus() == 0){
-//                    activeTasks.add(tasks.get(i));
-//                }
-//            }
-//            mListAdapter = new RecyclerViewAdapter(getContext(), activeTasks);
-//            mRecyclerView.setAdapter(mListAdapter);
-//        }
+        } else{
+
+            showTextViewPlaceHolder();
+            mListAdapter = new RecyclerViewAdapter(getContext(), tasks);
+            mRecyclerView.setAdapter(mListAdapter);
+        }
     }
 
+    public void showRecyclerView(){
+
+        mRecyclerView.setVisibility(View.VISIBLE);
+        mTextViewPlaceHolder.setVisibility(View.INVISIBLE);
+    }
+
+    public void showTextViewPlaceHolder(){
+
+        mTextViewPlaceHolder.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.INVISIBLE);
+    }
 }
 
