@@ -1,6 +1,7 @@
 package joshcarroll.projects.android.taskpal.activity;
 
 import android.Manifest;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -21,6 +22,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +42,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import java.io.File;
 
 import joshcarroll.projects.android.taskpal.R;
+import joshcarroll.projects.android.taskpal.adapter.RecyclerViewAdapter;
 import joshcarroll.projects.android.taskpal.adapter.SectionsPagerAdapter;
 import joshcarroll.projects.android.taskpal.data.NewTask;
 import joshcarroll.projects.android.taskpal.database.DBHandler;
@@ -56,10 +59,9 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private String TAG = "MAIN_ACTIVITY";
-    public ActionBar actionBar;
-    public Menu menu;
-    FloatingActionButton fab;
-    public static final int MY_PERMISSIONS_REQUEST_COURSE_LOCATION = 2;
+    private ActionBar actionBar;
+    private Menu menu;
+    private FloatingActionButton fab;
     private MenuItem menuItem;
 
     @Override
@@ -71,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
         if (menuItem != null) {
             menuItem.setVisible(true);
         }
-
         super.onBackPressed();
     }
 
@@ -88,8 +89,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
         if (!prefs.getBoolean("firstTime", false)) {
             // <---- run your one time code here
             dbHandler.setNotification(0);
-//            NewTask task = new NewTask(0, "Title", "Description", 0.0, 0.0, "Address", 1);
-//            dbHandler.addTask(task);
 
             // mark first time has ran.
             SharedPreferences.Editor editor = prefs.edit();
@@ -122,9 +121,11 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
             NewTask task = getIntent().getParcelableExtra("Task");
 
             if(task != null){
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.add(ViewSingleTaskFragment.newInstance(task), null);
-                ft.commit();
+//                FragmentTransaction ft = getFragmentManager().beginTransaction();
+//                ft.add(ViewSingleTaskFragment.newInstance(task), null);
+//                ft.commit();
+
+                TabbedPlaceholderFragment.mLayoutManager.scrollToPosition(task.getId());
             }
 
         }else{
@@ -175,11 +176,27 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
     @Override
     public void addTask(NewTask newTask) {
 
+//        android.app.Fragment fragment = getFragmentManager().findFragmentByTag("");
+//
+////                getFragmentManager().getFragment(new Bundle(), "allTaskFragment");
+
+
         if(TabbedPlaceholderFragment.tasks != null)
             TabbedPlaceholderFragment.tasks.add(newTask);
 
         if(TabbedPlaceholderFragment.activeTasks!= null)
             TabbedPlaceholderFragment.activeTasks.add(newTask);
+
+
+
+//        if(TabbedPlaceholderFragment.tasks.size() < 1){
+//
+//            TabbedPlaceholderFragment tabbedPlaceholderFragment = TabbedPlaceholderFragment.newInstance(0);
+//                        tabbedPlaceholderFragment.showTextViewPlaceHolder();
+//        }
+//        if(TabbedPlaceholderFragment.tasks.size() == 1){
+//            TabbedPlaceholderFragment.newInstance(0).showRecyclerView();
+//        }
 
         mSectionsPagerAdapter.allTasksFragment.mListAdapter.notifyItemInserted(newTask.getId());
         mSectionsPagerAdapter.allTasksFragment.mListAdapter.notifyDataSetChanged();

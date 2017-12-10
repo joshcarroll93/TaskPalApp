@@ -123,7 +123,6 @@ public class AddTaskFragment extends DialogFragment {
                     DBHandler db = new DBHandler(getActivity());
 
                     db.addTask(task);
-//                    TabbedPlaceholderFragment.showRecyclerView();
                     mListener.addTask(task);
 
                     dismiss();

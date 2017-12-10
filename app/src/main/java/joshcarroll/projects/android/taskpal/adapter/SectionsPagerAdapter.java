@@ -30,11 +30,9 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter{
         switch (position){
             case 0 :
                 allTasksFragment = (TabbedPlaceholderFragment) createdFragment;
-                //allTasksFragment.setListener(TabbedPlaceholderFragment.mListener);
                 break;
             case 1 :
                 activeTasksFragment = (TabbedPlaceholderFragment) createdFragment;
-                //activeTasksFragment.setListener(TabbedPlaceholderFragment.mListener);
                 break;
         }
         return createdFragment;

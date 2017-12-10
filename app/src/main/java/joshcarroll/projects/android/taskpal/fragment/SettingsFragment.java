@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
@@ -44,6 +45,8 @@ import joshcarroll.projects.android.taskpal.R;
 import joshcarroll.projects.android.taskpal.activity.MainActivity;
 import joshcarroll.projects.android.taskpal.database.DBHandler;
 import joshcarroll.projects.android.taskpal.service.LocationService;
+
+import static android.app.Activity.RESULT_OK;
 
 public class SettingsFragment extends Fragment {
 
@@ -84,7 +87,7 @@ public class SettingsFragment extends Fragment {
 
                 if(isChecked){
                     isPermissionGranted();
-                    checkIsLocationEnabled();
+//                    checkIsLocationEnabled();
                     Snackbar.make(v, "Notifications On", Snackbar.LENGTH_SHORT).show();
 
                 }else{
@@ -111,7 +114,9 @@ public class SettingsFragment extends Fragment {
             if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
 
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_FINE_LOCATION_REQUEST_CODE);
+                ActivityCompat.requestPermissions(getActivity()
+                        , new String[]{Manifest.permission.ACCESS_FINE_LOCATION}
+                        , ACCESS_FINE_LOCATION_REQUEST_CODE);
 
             } else {
                 //permission already granted
@@ -119,7 +124,7 @@ public class SettingsFragment extends Fragment {
             }
         }
         else{
-            Log.v("TAG","Permission was granted at install time");
+            Log.v(TAG,"Permission was granted at install time");
             checkIsLocationEnabled();
         }
     }
@@ -135,9 +140,6 @@ public class SettingsFragment extends Fragment {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
 
-                    //isLocationEnabled
-//                    checkIsLocationEnabled();
-                    startService();
 
                 } else {
                     Toast.makeText(getActivity(), "Permission denied", Toast.LENGTH_SHORT).show();
@@ -199,8 +201,8 @@ public class SettingsFragment extends Fragment {
                             status.startResolutionForResult(getActivity(), 1);
 
                             Log.i(TAG, "status:"+status.getStatus());
-                        } catch (IntentSender.SendIntentException e) {
-                            e.printStackTrace();
+                        } catch (IntentSender.SendIntentException sie) {
+                            sie.printStackTrace();
                             Log.i(TAG, "PendingIntent unable to execute request.");
                         }
                         break;
@@ -211,5 +213,15 @@ public class SettingsFragment extends Fragment {
                 }
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+
+        if(resultCode == RESULT_OK){
+            startService();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

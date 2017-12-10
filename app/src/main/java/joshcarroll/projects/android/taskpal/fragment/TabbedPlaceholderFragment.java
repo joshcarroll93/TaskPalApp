@@ -1,6 +1,7 @@
 package joshcarroll.projects.android.taskpal.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,9 +38,9 @@ public class TabbedPlaceholderFragment extends Fragment {
     public static List<NewTask> tasks;
 
     public RecyclerViewAdapter mListAdapter;
-    RecyclerView mRecyclerView;
+    public RecyclerView mRecyclerView;
 
-    private RecyclerView.LayoutManager mLayoutManager;
+    public static RecyclerView.LayoutManager mLayoutManager;
     private String TAG = "TABBED_PLACEHOLDER_FRAG";
     TextView mTextViewPlaceHolder;
 
@@ -60,7 +61,6 @@ public class TabbedPlaceholderFragment extends Fragment {
         return fragment;
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -74,9 +74,10 @@ public class TabbedPlaceholderFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-
         mTextViewPlaceHolder = (TextView)rootView.findViewById(R.id.placeholder_tv);
         mTextViewPlaceHolder.setVisibility(View.INVISIBLE);
+
+//        showTextViewPlaceHolder();
 
         if(getArguments().getInt(ARG_SECTION_NUMBER) == 1){
             allTasksIsChecked();
@@ -96,17 +97,17 @@ public class TabbedPlaceholderFragment extends Fragment {
 
             tasks = dbHandler.getAllTasks();
 
-            mListAdapter = new RecyclerViewAdapter(getContext(), tasks);
-            mRecyclerView.setAdapter(mListAdapter);
+//            mListAdapter = new RecyclerViewAdapter(getContext(), tasks);
+//            mRecyclerView.setAdapter(mListAdapter);
 
-        }else{
-
-            tasks = new ArrayList<NewTask>();
-
-            showTextViewPlaceHolder();
-            mListAdapter = new RecyclerViewAdapter(getContext(), tasks);
-            mRecyclerView.setAdapter(mListAdapter);
         }
+        else {
+            //tasks = new ArrayList<NewTask>();
+            showTextViewPlaceHolder();
+
+        }
+        mListAdapter = new RecyclerViewAdapter(getContext(), tasks);
+        mRecyclerView.setAdapter(mListAdapter);
     }
 
     public void activeTasksIsChecked() {
@@ -129,7 +130,7 @@ public class TabbedPlaceholderFragment extends Fragment {
         } else{
 
             showTextViewPlaceHolder();
-            mListAdapter = new RecyclerViewAdapter(getContext(), tasks);
+            mListAdapter = new RecyclerViewAdapter(getContext(), activeTasks);
             mRecyclerView.setAdapter(mListAdapter);
         }
     }
