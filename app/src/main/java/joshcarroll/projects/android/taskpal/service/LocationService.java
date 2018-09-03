@@ -22,6 +22,7 @@ import joshcarroll.projects.android.taskpal.R;
 import joshcarroll.projects.android.taskpal.activity.MainActivity;
 import joshcarroll.projects.android.taskpal.data.NewTask;
 import joshcarroll.projects.android.taskpal.database.DBHandler;
+import joshcarroll.projects.android.taskpal.database.VersionDbHandler;
 
 
 public class LocationService extends Service {
@@ -78,8 +79,9 @@ public class LocationService extends Service {
         public void onLocationChanged(final Location location) {
 
             Log.d(TAG, "Location changed: " + ""+location);
-
-            DBHandler db = new DBHandler(getApplicationContext());
+            VersionDbHandler versionDbHandler = new VersionDbHandler(getApplicationContext());
+            int version = versionDbHandler.getVersionNumber();
+            DBHandler db = new DBHandler(getApplicationContext(), ++version);
             List<NewTask> taskList = db.getAllTasks();
 
             Log.d("taskList size =" , ""+taskList.size());

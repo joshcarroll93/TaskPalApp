@@ -3,9 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/frameLayout"
-    android:clickable="true"
     android:padding="22dp"
-    tools:context="joshcarroll.projects.android.taskpal.fragment.SettingsFragment">
+    tools:context="joshcarroll.projects.android.taskpal.activity.SettingsActivity"
+    android:focusable="true">
 
         <TextView
             android:id="@+id/id_text_view_notifications"
@@ -23,4 +23,5 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:shadowColor="@color/ColorNavy" />
+
 </RelativeLayout>

@@ -1,110 +1,80 @@
 package joshcarroll.projects.android.taskpal.activity;
 
-import android.Manifest;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.Intent;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.Context;
-import android.content.IntentSender;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.location.LocationManager;
-import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
-
-import java.io.File;
-
+import joshcarroll.projects.android.taskpal.BuildConfig;
 import joshcarroll.projects.android.taskpal.R;
-import joshcarroll.projects.android.taskpal.adapter.RecyclerViewAdapter;
 import joshcarroll.projects.android.taskpal.adapter.SectionsPagerAdapter;
+import joshcarroll.projects.android.taskpal.data.DBVersion;
 import joshcarroll.projects.android.taskpal.data.NewTask;
 import joshcarroll.projects.android.taskpal.database.DBHandler;
+import joshcarroll.projects.android.taskpal.database.VersionDbHandler;
 import joshcarroll.projects.android.taskpal.fragment.AddTaskFragment;
 import joshcarroll.projects.android.taskpal.fragment.DeleteTaskFragment;
 import joshcarroll.projects.android.taskpal.fragment.EditTaskFragment;
-import joshcarroll.projects.android.taskpal.fragment.SettingsFragment;
 import joshcarroll.projects.android.taskpal.fragment.TabbedPlaceholderFragment;
-import joshcarroll.projects.android.taskpal.fragment.ViewSingleTaskFragment;
 import joshcarroll.projects.android.taskpal.listener.NewTaskListener;
+import joshcarroll.projects.android.taskpal.service.DatabaseUpdateService;
 
 
 public class MainActivity extends AppCompatActivity implements NewTaskListener{
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private String TAG = "MAIN_ACTIVITY";
-    private ActionBar actionBar;
-    private Menu menu;
     private FloatingActionButton fab;
-    private MenuItem menuItem;
-
-    @Override
-    public void onBackPressed() {
-        actionBar.setTitle(R.string.app_name);
-
-        fab.setVisibility(View.VISIBLE);
-
-        if (menuItem != null) {
-            menuItem.setVisible(true);
-        }
-        super.onBackPressed();
-    }
+    String s = BuildConfig.GOOGLE_PLACES_API_KEY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        actionBar = getSupportActionBar();
+        startService(new Intent(getApplicationContext(), DatabaseUpdateService.class));
 
-        DBHandler dbHandler = new DBHandler(getApplication());
+
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (!prefs.getBoolean("firstTime", false)) {
             // <---- run your one time code here
-            dbHandler.setNotification(0);
 
+
+            VersionDbHandler versionDbHandler = new VersionDbHandler(getApplicationContext());
+            versionDbHandler.setVersionNumber(5);
+            int version = versionDbHandler.getVersionNumber();
+            DBHandler dbHandler = new DBHandler(this,+version);
+            dbHandler.setNotification(0);
             // mark first time has ran.
             SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean("firstTime", true);
             editor.apply();
         }
 
+
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         // Set up the ViewPager with the sections adapter.
-        ViewPager viewPager = (ViewPager) findViewById(R.id.container);
+        ViewPager viewPager = findViewById(R.id.container);
         viewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab =  findViewById(R.id.fab);
         fab.setImageResource(R.drawable.edit_icon_white);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,30 +86,41 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
             }
         });
 
-        if (getIntent().getExtras() != null) {
+        if (getIntent().getExtras() != null){
 
             NewTask task = getIntent().getParcelableExtra("Task");
 
             if(task != null){
-//                FragmentTransaction ft = getFragmentManager().beginTransaction();
-//                ft.add(ViewSingleTaskFragment.newInstance(task), null);
-//                ft.commit();
-
                 TabbedPlaceholderFragment.mLayoutManager.scrollToPosition(task.getId());
+                Toast.makeText(getApplicationContext(), task.getTitle(), Toast.LENGTH_LONG).show();
             }
 
         }else{
             Log.i(TAG, "Parcelable Task is null");
+
+        }
+
+        if(isMyServiceRunning(DatabaseUpdateService.class)){
+            Toast.makeText(getApplicationContext(), "Database Service Running", Toast.LENGTH_LONG).show();
+            Log.d(TAG, "Service running");
+        }else{
+            Toast.makeText(getApplicationContext(), "Database Service NOT Running", Toast.LENGTH_LONG).show();
         }
     }
-
+    private boolean isMyServiceRunning(Class< DatabaseUpdateService> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.settings_menu, menu);
-
-        this.menu = menu;
 
         return true;
     }
@@ -154,71 +135,57 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
 
-            SettingsFragment settingsFragment = SettingsFragment.newInstance();
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
 
-            FragmentManager manager = getFragmentManager();
-            FragmentTransaction transaction = manager.beginTransaction();
-            transaction.replace(R.id.setting_fragment,settingsFragment,"SETTINGS_FRAGMENT");
-            transaction.addToBackStack("SettingFragment");
-
-            transaction.commit();
-
-            actionBar.setTitle("Settings");
-
-            fab.setVisibility(View.INVISIBLE);
-
-            menuItem = item;
-            menuItem.setVisible(false);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void addTask(NewTask newTask) {
-
-//        android.app.Fragment fragment = getFragmentManager().findFragmentByTag("");
-//
-////                getFragmentManager().getFragment(new Bundle(), "allTaskFragment");
-
-
         if(TabbedPlaceholderFragment.tasks != null)
             TabbedPlaceholderFragment.tasks.add(newTask);
 
         if(TabbedPlaceholderFragment.activeTasks!= null)
             TabbedPlaceholderFragment.activeTasks.add(newTask);
 
-
-
-//        if(TabbedPlaceholderFragment.tasks.size() < 1){
-//
-//            TabbedPlaceholderFragment tabbedPlaceholderFragment = TabbedPlaceholderFragment.newInstance(0);
-//                        tabbedPlaceholderFragment.showTextViewPlaceHolder();
-//        }
-//        if(TabbedPlaceholderFragment.tasks.size() == 1){
-//            TabbedPlaceholderFragment.newInstance(0).showRecyclerView();
-//        }
-
         mSectionsPagerAdapter.allTasksFragment.mListAdapter.notifyItemInserted(newTask.getId());
         mSectionsPagerAdapter.allTasksFragment.mListAdapter.notifyDataSetChanged();
+        mSectionsPagerAdapter.allTasksFragment.allTasksIsChecked();
+        mSectionsPagerAdapter.allTasksFragment.showRecyclerView();
 
         if(newTask.getStatus() == 0){
             mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyItemInserted(newTask.getId());
             mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyDataSetChanged();
+            mSectionsPagerAdapter.activeTasksFragment.activeTasksIsChecked();
+            mSectionsPagerAdapter.activeTasksFragment.showRecyclerView();
         }
     }
 
     @Override
     public void removeTask(NewTask removedTask) {
+        VersionDbHandler versionDbHandler = new VersionDbHandler(getApplicationContext());
+        DBHandler db = new DBHandler(getApplicationContext(), versionDbHandler.getVersionNumber());
 
         TabbedPlaceholderFragment.tasks.remove(removedTask);
         TabbedPlaceholderFragment.activeTasks.remove(removedTask);
 
         mSectionsPagerAdapter.allTasksFragment.mListAdapter.notifyItemRemoved(removedTask.getId());
         mSectionsPagerAdapter.allTasksFragment.mListAdapter.notifyDataSetChanged();
+        if(db.getEntriesCount() < 0){
+            mSectionsPagerAdapter.allTasksFragment.showTextViewPlaceHolder();
+        }
 
         if(removedTask.getStatus() == 0){
             mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyItemInserted(removedTask.getId());
             mSectionsPagerAdapter.activeTasksFragment.mListAdapter.notifyDataSetChanged();
+            mSectionsPagerAdapter.activeTasksFragment.showTextViewPlaceHolder();
+
+            if(db.getEntriesCount() < 0){
+                mSectionsPagerAdapter.activeTasksFragment.showTextViewPlaceHolder();
+            }
         }
     }
     @Override
@@ -257,8 +224,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListener{
         String getTask = task.getTitle() + "\n" + task.getDescription();
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("Task to copy", getTask);
+        assert clipboard != null;
         clipboard.setPrimaryClip(clip);
     }
-
-
 }

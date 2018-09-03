@@ -1,8 +1,6 @@
 package joshcarroll.projects.android.taskpal.fragment;
 
 import android.app.DialogFragment;
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.text.InputType;
@@ -12,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 
 import com.google.android.gms.common.api.Status;
@@ -25,8 +22,9 @@ import com.google.android.gms.maps.model.LatLng;
 import joshcarroll.projects.android.taskpal.R;
 import joshcarroll.projects.android.taskpal.data.NewTask;
 import joshcarroll.projects.android.taskpal.database.DBHandler;
+import joshcarroll.projects.android.taskpal.database.VersionDbHandler;
 import joshcarroll.projects.android.taskpal.listener.NewTaskListener;
-
+import joshcarroll.projects.android.taskpal.listener.UpdateView;
 
 public class AddTaskFragment extends DialogFragment {
 
@@ -37,13 +35,14 @@ public class AddTaskFragment extends DialogFragment {
     private double mLongitude;
     private View view;
     private NewTaskListener mListener;
-
+    private UpdateView mUpdateListener;
     public AddTaskFragment(){
 
     }
     public void setListener(NewTaskListener listener){
 
         this.mListener = listener;
+
     }
 
     @Override
@@ -73,7 +72,10 @@ public class AddTaskFragment extends DialogFragment {
         autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
-        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder().setTypeFilter(Place.TYPE_COUNTRY).setCountry("IE").build();
+        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                .setTypeFilter(Place.TYPE_COUNTRY)
+                .setCountry("IE")
+                .build();
 
         autocompleteFragment.setFilter(typeFilter);
 
@@ -86,7 +88,6 @@ public class AddTaskFragment extends DialogFragment {
                 LatLng queriedLocation = place.getLatLng();
                 mLatitude = queriedLocation.latitude;
                 mLongitude = queriedLocation.longitude;
-
             }
 
             @Override
@@ -120,7 +121,9 @@ public class AddTaskFragment extends DialogFragment {
 
                     Log.d("AddTaskFragment Lat: ", ""+mLatitude);
                     Log.d("AddTaskFragment Lng: ", ""+mLongitude);
-                    DBHandler db = new DBHandler(getActivity());
+                    VersionDbHandler versionDbHandler = new VersionDbHandler(getContext());
+                    int version = versionDbHandler.getVersionNumber();
+                    DBHandler db = new DBHandler(getActivity(), ++version);
 
                     db.addTask(task);
                     mListener.addTask(task);

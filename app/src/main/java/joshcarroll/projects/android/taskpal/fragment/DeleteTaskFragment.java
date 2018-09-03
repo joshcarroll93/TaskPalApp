@@ -11,6 +11,7 @@ import android.widget.Toast;
 import joshcarroll.projects.android.taskpal.R;
 import joshcarroll.projects.android.taskpal.data.NewTask;
 import joshcarroll.projects.android.taskpal.database.DBHandler;
+import joshcarroll.projects.android.taskpal.database.VersionDbHandler;
 import joshcarroll.projects.android.taskpal.listener.NewTaskListener;
 
 public class DeleteTaskFragment extends DialogFragment {
@@ -42,7 +43,9 @@ public class DeleteTaskFragment extends DialogFragment {
             @Override
             public void onClick(View view) {
 
-                db = new DBHandler(getActivity());
+                VersionDbHandler versionDbHandler = new VersionDbHandler(getContext());
+                int version = versionDbHandler.getVersionNumber();
+                db = new DBHandler(getActivity(), version);
 
                 db.deleteTask(mTask);
                 mListener.removeTask(mTask);

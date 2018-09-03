@@ -11,9 +11,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--android:value="@string/google_places_api_key"-->
 
-        <service android:name=".service.LocationService" android:enabled="true">
+        <service android:name=".service.LocationService" android:enabled="true" android:exported="false">
             <intent-filter>
                 <action android:name=".LocationService" />
 
@@ -21,10 +20,19 @@
             </intent-filter>
         </service>
 
-        <meta-data android:name="com.google.android.geo.API_KEY"
+        <service android:name=".service.DatabaseUpdateService" android:enabled="true" android:exported="false">
+            <intent-filter>
+                <action android:name=".DatabaseUpdateService" />
 
-            android:value= "AIzaSyDGD9tivCeeBRU2rlIEmv_2bH2I5EIMT0c">
-        </meta-data>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </service>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+
+            android:value="AIzaSyDGD9tivCeeBRU2rlIEmv_2bH2I5EIMT0c" />
 
         <activity android:name=".activity.MainActivity">
             <intent-filter>
@@ -32,6 +40,14 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".activity.SettingsActivity"
+            android:label="@string/setting_string"
+            android:parentActivityName=".activity.MainActivity">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity"/>
         </activity>
     </application>
 

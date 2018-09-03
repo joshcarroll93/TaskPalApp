@@ -1,7 +1,5 @@
 package joshcarroll.projects.android.taskpal.data;
 
-import joshcarroll.projects.android.taskpal.fragment.SettingsFragment;
-
 /**
  * Created by Josh on 10/11/2017.
  */

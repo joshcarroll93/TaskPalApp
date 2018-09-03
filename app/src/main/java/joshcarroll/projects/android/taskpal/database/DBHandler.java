@@ -3,6 +3,7 @@ package joshcarroll.projects.android.taskpal.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -10,12 +11,12 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import joshcarroll.projects.android.taskpal.data.DBVersion;
 import joshcarroll.projects.android.taskpal.data.NewTask;
 import joshcarroll.projects.android.taskpal.data.Setting;
 
 public class DBHandler extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "ToDoList";
     private static final String TASK_TABLE_NAME = "Tasks";
     private static final String SETTING_TABLE_NAME = "Settings";
@@ -29,10 +30,11 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String KEY_FLAG = "Flag";
 
     private static final String KEY_NOTIFICATION_SETTING = "notification_setting";
+    public static int mDatabaseVersion;
 
 
-    public DBHandler(Context context){
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    public DBHandler(Context context, int versionNumber){
+        super(context, DATABASE_NAME, null, versionNumber);
     }
 
     @Override
@@ -56,6 +58,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 + ")";
 
 
+
         sqLiteDatabase.execSQL(CREATE_SETTINGS_TABLE);
 
         sqLiteDatabase.execSQL(CREATE_TASK_TABLE);
@@ -63,29 +66,6 @@ public class DBHandler extends SQLiteOpenHelper {
 
     }
 
-    public boolean isTableExists(String tableName, boolean openDb) {
-        SQLiteDatabase mDatabase = this.getReadableDatabase();
-        if(openDb) {
-            if(mDatabase == null || !mDatabase.isOpen()) {
-                mDatabase = getReadableDatabase();
-            }
-
-            if(!mDatabase.isReadOnly()) {
-                mDatabase.close();
-                mDatabase = getReadableDatabase();
-            }
-        }
-
-        Cursor cursor = mDatabase.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"+tableName+"'", null);
-        if(cursor!=null) {
-            if(cursor.getCount()>0) {
-                cursor.close();
-                return true;
-            }
-            cursor.close();
-        }
-        return false;
-    }
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
 
@@ -198,6 +178,16 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    public int getEntriesCount(){
+
+        String countQuery = "SELECT  * FROM " + TASK_TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int count = cursor.getCount();
+        cursor.close();
+        return count;
+    }
+
     public int getNotificationSetting(){
         SQLiteDatabase db = this.getWritableDatabase();
         String selectQuery = "SELECT * FROM " + SETTING_TABLE_NAME;
@@ -225,4 +215,38 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
         return notification;
     }
+    public String getDatabaseVersion() {
+        Cursor cursor = SQLiteDatabase.openOrCreateDatabase(":memory:", null).rawQuery("select sqlite_version() AS sqlite_version", null);
+        String sqliteVersion = "";
+
+        while (cursor.moveToNext()) {
+            sqliteVersion += cursor.getString(0);
+        }
+        return sqliteVersion;
+    }
+
+    public boolean isTableExists(String tableName, boolean openDb) {
+        SQLiteDatabase mDatabase = this.getReadableDatabase();
+        if(openDb) {
+            if(mDatabase == null || !mDatabase.isOpen()) {
+                mDatabase = getReadableDatabase();
+            }
+
+            if(!mDatabase.isReadOnly()) {
+                mDatabase.close();
+                mDatabase = getReadableDatabase();
+            }
+        }
+
+        Cursor cursor = mDatabase.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"+tableName+"'", null);
+        if(cursor!=null) {
+            if(cursor.getCount()>0) {
+                cursor.close();
+                return true;
+            }
+            cursor.close();
+        }
+        return false;
+    }
+
 }

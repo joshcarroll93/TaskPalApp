@@ -38,7 +38,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         return 0;
     }
+    public void addItems(List<NewTask> newTasks) {
+        mTasks.clear();
+        if (mTasks != null)
+            mTasks.addAll(newTasks);
 
+        this.notifyDataSetChanged();
+    }
     // Create new views (invoked by the layout manager)
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

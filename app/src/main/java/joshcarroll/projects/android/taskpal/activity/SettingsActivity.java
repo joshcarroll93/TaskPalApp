@@ -1,9 +1,6 @@
-package joshcarroll.projects.android.taskpal.fragment;
+package joshcarroll.projects.android.taskpal.activity;
 
 import android.Manifest;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -17,22 +14,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
@@ -42,40 +32,36 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import joshcarroll.projects.android.taskpal.R;
-import joshcarroll.projects.android.taskpal.activity.MainActivity;
 import joshcarroll.projects.android.taskpal.database.DBHandler;
+import joshcarroll.projects.android.taskpal.database.VersionDbHandler;
 import joshcarroll.projects.android.taskpal.service.LocationService;
 
-import static android.app.Activity.RESULT_OK;
-
-public class SettingsFragment extends Fragment {
+public class SettingsActivity extends AppCompatActivity {
 
     private DBHandler dbHandler;
     private String TAG = "SETTINGS_FRAGMENT";
     private final int ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
 
-    public static SettingsFragment newInstance(){
-
-        return new SettingsFragment();
-    }
+//    public static SettingsActivity newInstance(){
+//
+//        return new SettingsActivity();
+//    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.fragment_settings);
+        android.app.ActionBar actionBar = this.getActionBar();
 
-        View view =  inflater.inflate(R.layout.fragment_settings, container, false);
+        if(actionBar != null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
-        onCreateFields(view);
-
-        return view;
-    }
-
-    private void onCreateFields(View view){
-
-        dbHandler = new DBHandler(getActivity());
-        final View v = view;
-        final MainActivity mainActivity = (MainActivity) getActivity();
-        TextView textView = (TextView)view.findViewById(R.id.id_text_view_notifications);
-        SwitchCompat switchCompat = (SwitchCompat)view.findViewById(R.id.id_notifications_switch);
+        VersionDbHandler versionDbHandler = new VersionDbHandler(getApplicationContext());
+        int version = versionDbHandler.getVersionNumber();
+        dbHandler = new DBHandler(getApplication(), ++version);
+        TextView notificationTextview = findViewById(R.id.id_text_view_notifications);
+        SwitchCompat switchCompat = findViewById(R.id.id_notifications_switch);
 
         if(dbHandler.getNotificationSetting()== 1){
             switchCompat.setChecked(true);
@@ -88,33 +74,34 @@ public class SettingsFragment extends Fragment {
                 if(isChecked){
                     isPermissionGranted();
 //                    checkIsLocationEnabled();
-                    Snackbar.make(v, "Notifications On", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(compoundButton, "Notifications On", Snackbar.LENGTH_SHORT).show();
 
                 }else{
                     stopService();
-                    Snackbar.make(v,  "Notifications Off", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(compoundButton,  "Notifications Off", Snackbar.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
+
     public void startService(){
-        getActivity().startService(new Intent(getActivity(), LocationService.class));
+        startService(new Intent(getApplicationContext(), LocationService.class));
         dbHandler.setNotification(1);
     }
 
     public void stopService(){
-        getActivity().stopService(new Intent(getActivity(), LocationService.class));
+        stopService(new Intent(getApplicationContext(), LocationService.class));
         dbHandler.setNotification(0);
     }
 
     public void isPermissionGranted() {
         if (Build.VERSION.SDK_INT >= 23) {
 
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+            if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
 
-                ActivityCompat.requestPermissions(getActivity()
+                ActivityCompat.requestPermissions(this
                         , new String[]{Manifest.permission.ACCESS_FINE_LOCATION}
                         , ACCESS_FINE_LOCATION_REQUEST_CODE);
 
@@ -138,11 +125,11 @@ public class SettingsFragment extends Fragment {
 
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getActivity(), "Permission granted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SettingsActivity.this, "Permission granted", Toast.LENGTH_SHORT).show();
 
 
                 } else {
-                    Toast.makeText(getActivity(), "Permission denied", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Permission denied", Toast.LENGTH_SHORT).show();
                 }
                 break;
             }
@@ -151,19 +138,19 @@ public class SettingsFragment extends Fragment {
 
     public void checkIsLocationEnabled(){
 
-        LocationManager lm = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
+        LocationManager lm = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         boolean gpsIsEnabled = false;
 
         try {
             gpsIsEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch(Exception ex) {ex.printStackTrace();}
+        } catch(NullPointerException ex) {ex.printStackTrace();}
 
         if(gpsIsEnabled) {
 
             startService();
         }
         else{
-            displayLocationSettingsRequest(getActivity());
+            displayLocationSettingsRequest(getApplicationContext());
         }
     }
     public void displayLocationSettingsRequest(Context context) {
@@ -198,7 +185,7 @@ public class SettingsFragment extends Fragment {
                         try {
                             // Show the dialog by calling startResolutionForResult(), and check the result
                             // in onActivityResult().
-                            status.startResolutionForResult(getActivity(), 1);
+                            status.startResolutionForResult(SettingsActivity.this, 1);
 
                             Log.i(TAG, "status:"+status.getStatus());
                         } catch (IntentSender.SendIntentException sie) {

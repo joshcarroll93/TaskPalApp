@@ -38,11 +38,9 @@
         app:srcCompat="@android:drawable/ic_dialog_email"
         app:backgroundTint="@color/ColorNavy" />
 
-<FrameLayout
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:id="@+id/setting_fragment"
-    android:background="@color/cardview_light_background"
-    >
-</FrameLayout>
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/setting_fragment"
+        android:background="@color/cardview_light_background"/>
 </android.support.design.widget.CoordinatorLayout>

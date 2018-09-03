@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.LatLng;
 import joshcarroll.projects.android.taskpal.R;
 import joshcarroll.projects.android.taskpal.data.NewTask;
 import joshcarroll.projects.android.taskpal.database.DBHandler;
+import joshcarroll.projects.android.taskpal.database.VersionDbHandler;
 import joshcarroll.projects.android.taskpal.listener.NewTaskListener;
 import joshcarroll.projects.android.taskpal.utils.Utils;
 
@@ -121,7 +122,10 @@ public class EditTaskFragment extends DialogFragment {
                     Log.d(TAG+ " Lat:", ""+mLatitude);
                     Log.d(TAG+ " Lng:", ""+mLongitude);
 
-                    DBHandler db = new DBHandler(getActivity());
+                    VersionDbHandler versionDbHandler = new VersionDbHandler(getContext());
+                    int version = versionDbHandler.getVersionNumber();
+
+                    DBHandler db = new DBHandler(getActivity(), ++version);
 
                     db.editTask(task, position);
                     mListener.removeTask(mTask);
